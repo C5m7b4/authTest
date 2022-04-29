@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" onload="initClient()" async defer></script>
+  <script>
+    var client;
+    var access_token;
+
+    // function createCorsRequest(method, url){
+    //   var xhr = new XMLHttpRequest()
+    //   if ( "withCredentials" in xhr){
+    //     // Check if the XMLHttpRequests object has a "withCredentials" property
+    //     // withCredentials on exists on XMLHttpRequest2 objects
+    //     xhr.open(method, url, true);
+    //   } else if ( typeof XDomainRequest != 'undefined'){
+    //     // otherwise, check if XDomainRequest
+    //     // XDomainRequest on exists in IE, and is IE's was of making Cors requests
+    //     xhr = new XDomainRequest();
+    //     xhr.open(method, url)
+    //   } else {
+    //     xhr = null;
+    //   }
+    //   return xhr;
+    // }
+
+    function initClient() {
+      client = google.accounts.oauth2.initTokenClient({
+        client_id: '146519115296-bjcbn2epm633imi6h9f4c23qi70vbvh6.apps.googleusercontent.com',
+        scope: 'https://www.googleapis.com/auth/userinfo.email',
+        callback: (tokenResponse) => {
+          access_token = tokenResponse.access_token;
+          console.log(tokenResponse)
+          console.log(access_token)
+        }
+      })
+    }
+
+    function getToken() {
+      client.requestAccessToken();
+    }
+
+
+    function validateToken() {
+      var xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          const response = JSON.parse(xhr.responseText)
+          console.log('response', response)
+          const email = response.email;
+          console.log('email', email)
+        }
+      }
+      xhr.open('GET', 'https://www.googleapis.com/oauth2/v3/userinfo?access_token=' + access_token)
+      xhr.send();
+    }
+
+  </script>
+  <title>Auth Test</title>
+</head>
+
+<body>
+  <h2>Testing Google oAuth</h2>
+  <button onClick="getToken()">Get Token</button>
+  <button onClick="validateToken()">Validate Token</button>
+</body>
+
+</html>
